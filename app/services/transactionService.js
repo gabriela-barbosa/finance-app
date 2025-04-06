@@ -1,3 +1,4 @@
+/* global console */
 import { supabase } from './supabase';
 
 export async function getTransactions() {
