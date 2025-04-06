@@ -1,34 +1,25 @@
 import { NextResponse } from 'next/server';
+import {
+  getTransactions,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from '@/app/services/transactionService';
 
 export async function GET() {
-  // Mock transactions data for demo
-  const transactions = [
-    {
-      id: 1,
-      description: 'Salário',
-      category: 'Renda',
-      date: '05/05/2024',
-      amount: 5000,
-      type: 'receita',
-    },
-    {
-      id: 2,
-      description: 'Aluguel',
-      category: 'Moradia',
-      date: '10/05/2024',
-      amount: 1200,
-      type: 'despesa',
-    },
-  ];
-
-  return NextResponse.json(transactions);
+  try {
+    const transactions = await getTransactions();
+    return NextResponse.json(transactions);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function POST(request) {
   try {
     const transaction = await request.json();
 
-    // Validate required fields
+    // Validar campos obrigatórios
     if (
       !transaction.description ||
       !transaction.amount ||
@@ -41,17 +32,16 @@ export async function POST(request) {
       );
     }
 
-    // In a real implementation, you would save the transaction to a database
-    // For now, we just return the transaction with an ID
-    const newTransaction = {
-      id: Date.now(),
-      date: transaction.date || new Date().toLocaleDateString('pt-BR'),
-      ...transaction,
-    };
+    // Formatar a data se não for fornecida
+    if (!transaction.date) {
+      transaction.date = new Date().toISOString();
+    }
 
+    // Salvar a transação no Supabase
+    const newTransaction = await createTransaction(transaction);
     return NextResponse.json(newTransaction, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: 'Erro ao processar a transação' }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -59,7 +49,7 @@ export async function PUT(request) {
   try {
     const transaction = await request.json();
 
-    // Validate transaction data
+    // Validar dados da transação
     if (
       !transaction.id ||
       !transaction.description ||
@@ -73,29 +63,30 @@ export async function PUT(request) {
       );
     }
 
-    // In a real implementation, you would update the transaction in a database
-    // For demo purposes, we'll just return the updated transaction
+    // Atualizar a transação no Supabase
+    const id = transaction.id;
+    const updatedTransaction = await updateTransaction(id, transaction);
 
-    return NextResponse.json(transaction);
-  } catch {
-    return NextResponse.json({ error: 'Erro ao atualizar a transação' }, { status: 500 });
+    return NextResponse.json(updatedTransaction);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(request) {
   try {
-    // In Next.js route handlers, we can use the nextUrl property on request
+    // Obter o ID da URL
     const id = request.nextUrl.searchParams.get('id');
 
     if (!id) {
       return NextResponse.json({ error: 'ID da transação é obrigatório' }, { status: 400 });
     }
 
-    // In a real implementation, you would delete the transaction from a database
-    // For demo purposes, we'll just return a success message
+    // Excluir a transação no Supabase
+    await deleteTransaction(id);
 
     return NextResponse.json({ message: 'Transação excluída com sucesso' });
-  } catch {
-    return NextResponse.json({ error: 'Erro ao excluir a transação' }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TransactionFilters, Button, Card, Table, ImportTransactionsModal } from '@/app/components';
+import { getTransactions, createTransaction } from '@/app/services/transactionService';
 
 const Transactions = () => {
   const [filters, setFilters] = useState({
@@ -11,88 +12,26 @@ const Transactions = () => {
     sort: 'recentes',
   });
 
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      description: 'Salário',
-      category: 'Renda',
-      date: '05/05/2024',
-      amount: 5000,
-      type: 'receita',
-    },
-    {
-      id: 2,
-      description: 'Aluguel',
-      category: 'Moradia',
-      date: '10/05/2024',
-      amount: 1200,
-      type: 'despesa',
-    },
-    {
-      id: 3,
-      description: 'Supermercado',
-      category: 'Alimentação',
-      date: '12/05/2024',
-      amount: 450.32,
-      type: 'despesa',
-    },
-    {
-      id: 4,
-      description: 'Academia',
-      category: 'Saúde',
-      date: '15/05/2024',
-      amount: 100,
-      type: 'despesa',
-    },
-    {
-      id: 5,
-      description: 'Uber',
-      category: 'Transporte',
-      date: '18/05/2024',
-      amount: 78.5,
-      type: 'despesa',
-    },
-    {
-      id: 6,
-      description: 'Jantar com amigas',
-      category: 'Lazer',
-      date: '20/05/2024',
-      amount: 120,
-      type: 'despesa',
-    },
-    {
-      id: 7,
-      description: 'Cabeleireiro',
-      category: 'Cuidados Pessoais',
-      date: '22/05/2024',
-      amount: 150,
-      type: 'despesa',
-    },
-    {
-      id: 8,
-      description: 'Curso online',
-      category: 'Educação',
-      date: '25/05/2024',
-      amount: 350,
-      type: 'despesa',
-    },
-    {
-      id: 9,
-      description: 'Freelance',
-      category: 'Renda',
-      date: '28/05/2024',
-      amount: 800,
-      type: 'receita',
-    },
-    {
-      id: 10,
-      description: 'Farmácia',
-      category: 'Saúde',
-      date: '30/05/2024',
-      amount: 45.7,
-      type: 'despesa',
-    },
-  ]);
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getTransactions();
+      setTransactions(data);
+      setError(null);
+    } catch {
+      setError('Erro ao carregar transações. Tente novamente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (filter, value) => {
     setFilters({
@@ -101,14 +40,24 @@ const Transactions = () => {
     });
   };
 
-  const handleImportTransactions = (importedTransactions) => {
-    // Add ID to each imported transaction
-    const newTransactions = importedTransactions.map((transaction) => ({
-      ...transaction,
-      id: Date.now() + Math.floor(Math.random() * 1000),
-    }));
+  const handleImportTransactions = async (importedTransactions) => {
+    try {
+      setIsLoading(true);
 
-    setTransactions([...transactions, ...newTransactions]);
+      // Process each transaction and save to the database
+      const savedTransactions = [];
+      for (const transaction of importedTransactions) {
+        const savedTransaction = await createTransaction(transaction);
+        savedTransactions.push(savedTransaction);
+      }
+
+      // Refresh the transactions list after importing
+      await fetchTransactions();
+    } catch {
+      setError('Erro ao importar transações.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -123,15 +72,9 @@ const Transactions = () => {
 
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (filters.sort === 'recentes') {
-      return (
-        new Date(b.date.split('/').reverse().join('/')) -
-        new Date(a.date.split('/').reverse().join('/'))
-      );
+      return new Date(b.date) - new Date(a.date);
     } else if (filters.sort === 'antigas') {
-      return (
-        new Date(a.date.split('/').reverse().join('/')) -
-        new Date(b.date.split('/').reverse().join('/'))
-      );
+      return new Date(a.date) - new Date(b.date);
     } else if (filters.sort === 'maior') {
       return b.amount - a.amount;
     } else if (filters.sort === 'menor') {
@@ -142,11 +85,11 @@ const Transactions = () => {
 
   const totalIncome = transactions
     .filter((t) => t.type === 'receita')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
 
   const totalExpenses = transactions
     .filter((t) => t.type === 'despesa')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
 
   const balance = totalIncome - totalExpenses;
 
@@ -179,88 +122,96 @@ const Transactions = () => {
         <Card>
           <TransactionFilters filters={filters} onFilterChange={handleFilterChange} />
 
-          <Table
-            columns={[
-              {
-                key: 'description',
-                label: 'Descrição',
-                render: (row) => (
-                  <div className="flex items-center">
-                    <span className="text-white">{row.description}</span>
-                    {row.installment && (
-                      <span className="ml-2 px-1.5 py-0.5 text-xs font-medium rounded bg-secondary/20 text-secondary">
-                        {row.installment.current}/{row.installment.total}
-                      </span>
-                    )}
-                  </div>
-                ),
-              },
-              {
-                key: 'category',
-                label: 'Categoria',
-                render: (row) => (
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary/10 text-primary">
-                    {row.category}
-                  </span>
-                ),
-              },
-              {
-                key: 'date',
-                label: 'Data',
-                render: (row) => <div className="text-sm text-muted-foreground">{row.date}</div>,
-              },
-              {
-                key: 'amount',
-                label: 'Valor',
-                render: (row) => (
-                  <div
-                    className={`text-sm font-medium ${row.type === 'receita' ? 'text-success' : 'text-danger'}`}
-                  >
-                    {row.type === 'receita' ? '+' : '-'} R$ {row.amount.toFixed(2)}
-                  </div>
-                ),
-              },
-              {
-                key: 'type',
-                label: 'Tipo',
-                render: (row) => (
-                  <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      row.type === 'receita'
-                        ? 'bg-success/10 text-success'
-                        : 'bg-danger/10 text-danger'
-                    }`}
-                  >
-                    {row.type === 'receita' ? 'Receita' : 'Despesa'}
-                  </span>
-                ),
-              },
-              {
-                key: 'actions',
-                label: '',
-                render: () => (
-                  <div className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      className="text-primary hover:text-primary/80 mr-2"
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <p>Carregando transações...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-danger/10 p-4 rounded-md text-danger text-center my-4">{error}</div>
+          ) : (
+            <Table
+              columns={[
+                {
+                  key: 'description',
+                  label: 'Descrição',
+                  render: (row) => (
+                    <div className="flex items-center">
+                      <span className="text-white">{row.description}</span>
+                      {row.installment && (
+                        <span className="ml-2 px-1.5 py-0.5 text-xs font-medium rounded bg-secondary/20 text-secondary">
+                          {row.installment.current}/{row.installment.total}
+                        </span>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'category',
+                  label: 'Categoria',
+                  render: (row) => (
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary/10 text-primary">
+                      {row.category}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'date',
+                  label: 'Data',
+                  render: (row) => <div className="text-sm text-muted-foreground">{row.date}</div>,
+                },
+                {
+                  key: 'amount',
+                  label: 'Valor',
+                  render: (row) => (
+                    <div
+                      className={`text-sm font-medium ${row.type === 'receita' ? 'text-success' : 'text-danger'}`}
                     >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      className="text-danger hover:text-danger/80"
+                      {row.type === 'receita' ? '+' : '-'} R$ {row.amount.toFixed(2)}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'type',
+                  label: 'Tipo',
+                  render: (row) => (
+                    <span
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        row.type === 'receita'
+                          ? 'bg-success/10 text-success'
+                          : 'bg-danger/10 text-danger'
+                      }`}
                     >
-                      Excluir
-                    </Button>
-                  </div>
-                ),
-              },
-            ]}
-            data={sortedTransactions}
-            emptyMessage="Nenhuma transação encontrada com os filtros atuais."
-          />
+                      {row.type === 'receita' ? 'Receita' : 'Despesa'}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'actions',
+                  label: '',
+                  render: () => (
+                    <div className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        className="text-primary hover:text-primary/80 mr-2"
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        className="text-danger hover:text-danger/80"
+                      >
+                        Excluir
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]}
+              data={sortedTransactions}
+              emptyMessage="Nenhuma transação encontrada com os filtros atuais."
+            />
+          )}
         </Card>
       </div>
     </main>

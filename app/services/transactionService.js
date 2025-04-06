@@ -1,46 +1,80 @@
-/* global console */
-import axios from 'axios';
+import { supabase } from './supabase';
 
-const API_BASE_URL = '/api';
+export async function getTransactions() {
+  try {
+    // Verifique se o cliente Supabase está funcionando
+    console.log('Supabase URL:', supabase.supabaseUrl);
 
-export const transactionService = {
-  getTransactions: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/transactions`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao buscar transações:', error);
-      throw error;
+    // Tente listar todas as tabelas para depuração
+    const { data: tables, error: tablesError } = await supabase
+      .from('pg_catalog.pg_tables')
+      .select('tablename')
+      .eq('schemaname', 'public');
+
+    if (tablesError) {
+      console.error('Erro ao listar tabelas:', tablesError);
+    } else {
+      console.log('Tabelas disponíveis:', tables);
     }
-  },
 
-  createTransaction: async (transaction) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/transactions`, transaction);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao criar transação:', error);
-      throw error;
-    }
-  },
+    // Consulta original
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('date', { ascending: false });
 
-  updateTransaction: async (id, transaction) => {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/transactions/${id}`, transaction);
-      return response.data;
-    } catch (error) {
-      console.error(`Erro ao atualizar transação ${id}:`, error);
-      throw error;
+    if (error) {
+      console.error('Erro detalhado:', error);
+      throw new Error(`Falha ao buscar transações: ${error.message}`);
     }
-  },
 
-  deleteTransaction: async (id) => {
-    try {
-      const response = await axios.delete(`${API_BASE_URL}/transactions/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Erro ao excluir transação ${id}:`, error);
-      throw error;
-    }
-  },
-};
+    return data || [];
+  } catch (e) {
+    console.error('Exceção ao buscar transações:', e);
+    throw e;
+  }
+}
+
+export async function getTransactionById(id) {
+  const { data, error } = await supabase.from('transactions').select('*').eq('id', id).single();
+
+  if (error) {
+    throw new Error(`Falha ao buscar transação ${id}: ${error.message}`);
+  }
+
+  return data;
+}
+
+export async function createTransaction(transaction) {
+  const { data, error } = await supabase.from('transactions').insert(transaction).select();
+
+  if (error) {
+    throw new Error(`Falha ao criar transação: ${error.message}`);
+  }
+
+  return data[0];
+}
+
+export async function updateTransaction(id, transaction) {
+  const { data, error } = await supabase
+    .from('transactions')
+    .update(transaction)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    throw new Error(`Falha ao atualizar transação ${id}: ${error.message}`);
+  }
+
+  return data[0];
+}
+
+export async function deleteTransaction(id) {
+  const { error } = await supabase.from('transactions').delete().eq('id', id);
+
+  if (error) {
+    throw new Error(`Falha ao excluir transação ${id}: ${error.message}`);
+  }
+
+  return true;
+}
