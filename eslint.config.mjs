@@ -1,14 +1,50 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import eslintPluginImport from 'eslint-plugin-import';
+import js from '@eslint/js';
+import prettierConfig from 'eslint-config-prettier';
+import eslintPluginReact from 'eslint-plugin-react';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+/** @type {import("eslint").Linter.FlatConfig[]} */
+export default [
+  js.configs.recommended,
+  {
+    files: ['**/*.js', '**/*.jsx'],
+    plugins: {
+      import: eslintPluginImport,
+      react: eslintPluginReact,
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    settings: {
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx'],
+        },
+      },
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      // Exportações
+      'import/prefer-default-export': 'off',
+      'import/no-default-export': 'off', // Desabilitado para permitir exportações padrão
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+      // Importações relativas
+      'import/no-relative-parent-imports': 'off', // Desabilitado pois usamos jsconfig.json
+      'import/no-relative-packages': 'warn',
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
-
-export default eslintConfig;
+      // JSX
+      'react/jsx-uses-vars': 'error', // Fix para o problema "is defined but never used" em componentes JSX
+      'react/jsx-uses-react': 'error',
+    },
+  },
+  // Add Prettier config to avoid conflicts
+  prettierConfig,
+];

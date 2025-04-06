@@ -1,0 +1,67 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Absolute Imports Rule
+
+Always use absolute imports instead of relative imports for better readability, maintainability, and to avoid path confusion.
+
+## Configuration
+
+Ensure your project has the following configuration:
+
+### For TypeScript (tsconfig.json)
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    }
+  }
+}
+```
+
+### For JavaScript (jsconfig.json)
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    }
+  }
+}
+```
+
+## Usage Guidelines
+
+- Always import from the root of the project using the `@/` prefix
+- Avoid using relative imports with `../` or `./` notation
+- Structure imports in a logical order: external libraries first, then internal absolute imports
+
+## Examples
+
+### Preferred (Absolute Imports):
+```typescript
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { formatDate } from '@/lib/utils';
+import type { User } from '@/types';
+```
+
+### Avoid (Relative Imports):
+```typescript
+import { useState } from 'react';
+import { Button } from '../../components/ui/button';
+import { formatDate } from '../../../lib/utils';
+import type { User } from '../types';
+```
+
+## Benefits
+
+- Cleaner, more readable code
+- Easier refactoring and file movement
+- Easier to understand import paths
+- Consistent import style across the project 
