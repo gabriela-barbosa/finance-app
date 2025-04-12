@@ -1,42 +1,19 @@
-/* global console */
 import { supabase } from './supabase';
 
-export async function getTransactions() {
-  try {
-    // Verifique se o cliente Supabase está funcionando
-    console.log('Supabase URL:', supabase.supabaseUrl);
+export const getTransactions = async () => {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .order('date', { ascending: false });
 
-    // Tente listar todas as tabelas para depuração
-    const { data: tables, error: tablesError } = await supabase
-      .from('pg_catalog.pg_tables')
-      .select('tablename')
-      .eq('schemaname', 'public');
-
-    if (tablesError) {
-      console.error('Erro ao listar tabelas:', tablesError);
-    } else {
-      console.log('Tabelas disponíveis:', tables);
-    }
-
-    // Consulta original
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('date', { ascending: false });
-
-    if (error) {
-      console.error('Erro detalhado:', error);
-      throw new Error(`Falha ao buscar transações: ${error.message}`);
-    }
-
-    return data || [];
-  } catch (e) {
-    console.error('Exceção ao buscar transações:', e);
-    throw e;
+  if (error) {
+    throw new Error(`Falha ao buscar transações: ${error.message}`);
   }
-}
 
-export async function getTransactionById(id) {
+  return data || [];
+};
+
+export const getTransactionById = async (id) => {
   const { data, error } = await supabase.from('transactions').select('*').eq('id', id).single();
 
   if (error) {
@@ -44,9 +21,9 @@ export async function getTransactionById(id) {
   }
 
   return data;
-}
+};
 
-export async function createTransaction(transaction) {
+export const createTransaction = async (transaction) => {
   const { data, error } = await supabase.from('transactions').insert(transaction).select();
 
   if (error) {
@@ -54,9 +31,9 @@ export async function createTransaction(transaction) {
   }
 
   return data[0];
-}
+};
 
-export async function updateTransaction(id, transaction) {
+export const updateTransaction = async (id, transaction) => {
   const { data, error } = await supabase
     .from('transactions')
     .update(transaction)
@@ -68,9 +45,9 @@ export async function updateTransaction(id, transaction) {
   }
 
   return data[0];
-}
+};
 
-export async function deleteTransaction(id) {
+export const deleteTransaction = async (id) => {
   const { error } = await supabase.from('transactions').delete().eq('id', id);
 
   if (error) {
@@ -78,4 +55,4 @@ export async function deleteTransaction(id) {
   }
 
   return true;
-}
+};

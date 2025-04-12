@@ -148,29 +148,29 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-neutral-100 rounded-lg shadow p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-card rounded-lg shadow p-6">
             <h3 className="text-sm font-semibold text-foreground mb-1">Receitas</h3>
             <p className="text-2xl font-bold text-success">
               R$ {currentMonthData.receitas.toFixed(2)}
             </p>
           </div>
 
-          <div className="bg-neutral-100 rounded-lg shadow p-6">
+          <div className="bg-card rounded-lg shadow p-6">
             <h3 className="text-sm font-semibold text-foreground mb-1">Despesas</h3>
             <p className="text-2xl font-bold text-danger">
               R$ {currentMonthData.despesas.toFixed(2)}
             </p>
           </div>
 
-          <div className="bg-neutral-100 rounded-lg shadow p-6">
+          <div className="bg-card rounded-lg shadow p-6">
             <h3 className="text-sm font-semibold text-foreground mb-1">Saldo</h3>
             <p className={`text-2xl font-bold ${balance >= 0 ? 'text-success' : 'text-danger'}`}>
               R$ {balance.toFixed(2)}
             </p>
           </div>
 
-          <div className="bg-neutral-100 rounded-lg shadow p-6">
+          <div className="bg-card rounded-lg shadow p-6">
             <h3 className="text-sm font-semibold text-foreground mb-1">Taxa de Economia</h3>
             <p className="text-2xl font-bold text-primary">{savingsRate.toFixed(1)}%</p>
           </div>
@@ -178,7 +178,7 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <div className="bg-neutral-100 rounded-lg shadow mb-8">
+            <div className="bg-card rounded-lg shadow mb-8">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-6">Despesas por Categoria</h3>
 
@@ -193,7 +193,7 @@ const Dashboard = () => {
                             R$ {amount.toFixed(2)} ({percentage.toFixed(0)}%)
                           </span>
                         </div>
-                        <div className="w-full bg-neutral-200 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div
                             className="bg-primary h-2 rounded-full"
                             style={{ width: `${percentage}%` }}
@@ -206,12 +206,12 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="bg-neutral-100 rounded-lg shadow">
+            <div className="bg-card rounded-lg shadow">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-6">Transações Recentes</h3>
 
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-neutral-200">
+                  <table className="min-w-full divide-y divide-border">
                     <thead>
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-foreground uppercase tracking-wider">
@@ -228,7 +228,7 @@ const Dashboard = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-200">
+                    <tbody className="divide-y divide-border">
                       {recentTransactions.map((transaction) => (
                         <tr key={transaction.id}>
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-foreground">
@@ -258,12 +258,12 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <div className="bg-neutral-100 rounded-lg shadow mb-8">
+            <div className="bg-card rounded-lg shadow mb-8">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-6">Dicas de Economia</h3>
 
                 <div className="space-y-4">
-                  <div className="bg-neutral-200 p-4 rounded-lg">
+                  <div className="bg-muted p-4 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">Diversifique investimentos</h4>
                     <p className="text-sm text-foreground">
                       Considere distribuir seu dinheiro em diferentes tipos de investimentos para
@@ -271,7 +271,7 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <div className="bg-neutral-200 p-4 rounded-lg">
+                  <div className="bg-muted p-4 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">
                       Crie um fundo de emergência
                     </h4>
@@ -281,7 +281,7 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <div className="bg-neutral-200 p-4 rounded-lg">
+                  <div className="bg-muted p-4 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">Reduza gastos supérfluos</h4>
                     <p className="text-sm text-foreground">
                       Identifique e elimine gastos desnecessários como assinaturas não utilizadas ou
@@ -292,7 +292,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="bg-neutral-100 rounded-lg shadow">
+            <div className="bg-card rounded-lg shadow">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-6">Próximas Despesas</h3>
 
@@ -300,7 +300,7 @@ const Dashboard = () => {
                   {upcomingExpenses.map((expense) => (
                     <div
                       key={expense.id}
-                      className="flex items-center justify-between p-3 bg-neutral-200 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
                     >
                       <div>
                         <h4 className="font-medium text-foreground">{expense.description}</h4>

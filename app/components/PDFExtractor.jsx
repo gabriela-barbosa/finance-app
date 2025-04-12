@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { extractTransactionsFromText } from '@/app/helpers/transactionExtractor';
-import { Button } from './Button';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { Textarea } from './ui/textarea';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from './ui/alert';
 
 export const PDFExtractor = ({ onExtractComplete }) => {
   const [text, setText] = useState('');
@@ -44,48 +48,54 @@ export const PDFExtractor = ({ onExtractComplete }) => {
   };
 
   return (
-    <div className="w-full space-y-3">
-      <div className="p-4 bg-[#3a3444] rounded-lg">
-        <p className="text-sm text-neutral-300 mb-2">
-          Cole o texto das transações da sua fatura de cartão abaixo:
-        </p>
-        <textarea
-          className="w-full h-40 p-3 rounded-md ring-primary bg-neutral-200 text-white border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-primary text-base leading-relaxed"
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-medium">Extrair Transações</CardTitle>
+        <CardDescription>
+          Cole o texto das transações da sua fatura de cartão abaixo
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Textarea
+          className="min-h-32"
           placeholder="Cole aqui o texto das transações da sua fatura (suporta diversos formatos)"
           value={text}
           onChange={handleTextChange}
-        ></textarea>
-        <div className="flex justify-end mt-2">
-          <Button
-            onClick={handleExtractTransactions}
-            disabled={isLoading || !text.trim()}
-            variant="primary"
-            size="medium"
-          >
+        />
+
+        <div className="flex justify-end">
+          <Button onClick={handleExtractTransactions} disabled={isLoading || !text.trim()}>
             {isLoading ? 'Processando...' : 'Extrair Transações'}
           </Button>
         </div>
-      </div>
 
-      {error && <div className="text-sm text-danger text-center">{error}</div>}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <div className="text-xs text-neutral-400">
-        <p>Formatos suportados:</p>
-        <ul className="list-disc pl-5 space-y-1 mt-1">
-          <li>
-            Santander/BB:{' '}
-            <span className="text-neutral-300">
-              04/04/2025 Shopee *Webcontinent(01/12) US$ 0,00 R$ 180,88
-            </span>
-          </li>
-          <li>
-            Nubank:{' '}
-            <span className="text-neutral-300">27 JAN Petlove - NuPay - Parcela 2/3 R$ 19,80</span>
-          </li>
-          <li>O sistema identifica automaticamente estornos, pagamentos e compras parceladas</li>
-          <li>Certifique-se de incluir a data, descrição completa e valor</li>
-        </ul>
-      </div>
-    </div>
+        <div className="text-xs text-muted-foreground border rounded-md p-3 bg-muted/20">
+          <p className="font-medium mb-1">Formatos suportados:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>
+              <span className="font-medium">Santander/BB:</span>{' '}
+              <span className="text-foreground/80">
+                04/04/2025 Shopee *Webcontinent(01/12) US$ 0,00 R$ 180,88
+              </span>
+            </li>
+            <li>
+              <span className="font-medium">Nubank:</span>{' '}
+              <span className="text-foreground/80">
+                27 JAN Petlove - NuPay - Parcela 2/3 R$ 19,80
+              </span>
+            </li>
+            <li>O sistema identifica automaticamente estornos, pagamentos e compras parceladas</li>
+            <li>Certifique-se de incluir a data, descrição completa e valor</li>
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

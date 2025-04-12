@@ -1,14 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
-import { PDFExtractor } from './';
-import { Button } from './';
+import { PDFExtractor } from './PDFExtractor';
+import { Button } from './ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './ui/table';
 
 export const ImportTransactionsModal = ({ onImport }) => {
   const [open, setOpen] = useState(false);
   const [extractedTransactions, setExtractedTransactions] = useState([]);
-  const [step, setStep] = useState('paste'); // 'paste' or 'review'
+  const [step, setStep] = useState('paste');
 
   const handleExtractComplete = (transactions) => {
     setExtractedTransactions(transactions);
@@ -29,85 +38,87 @@ export const ImportTransactionsModal = ({ onImport }) => {
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <Button variant="outline" className="ml-2">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="default">
           Importar Transações
         </Button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#2a2532] rounded-lg shadow-lg p-6 w-[90%] max-w-2xl max-h-[90vh] overflow-auto z-50">
-          <Dialog.Title className="text-xl font-bold text-white mb-4">
+      </DialogTrigger>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
+        <DialogHeader>
+          <DialogTitle>
             {step === 'paste' ? 'Importar Transações da Fatura' : 'Revisar Transações Extraídas'}
-          </Dialog.Title>
-
-          {step === 'paste' ? (
-            <div className="space-y-4">
-              <p className="text-sm text-neutral-300">
-                Copie e cole as transações da sua fatura de cartão de crédito para importá-las
-                automaticamente.
-              </p>
-              <PDFExtractor onExtractComplete={handleExtractComplete} />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-neutral-300 mb-4">
-                {extractedTransactions.length} transações foram encontradas. Revise-as antes de
-                importar.
-              </p>
-
-              <div className="max-h-[50vh] overflow-auto">
-                <table className="w-full">
-                  <thead className="bg-[#3a3444] text-neutral-300">
-                    <tr>
-                      <th className="p-2 text-left text-sm">Data</th>
-                      <th className="p-2 text-left text-sm">Descrição</th>
-                      <th className="p-2 text-center text-sm">Parcela</th>
-                      <th className="p-2 text-center text-sm">Total</th>
-                      <th className="p-2 text-right text-sm">Valor (R$)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {extractedTransactions.map((transaction, index) => (
-                      <tr key={index} className="border-b border-[#3a3444] last:border-0">
-                        <td className="p-2 text-sm text-neutral-300">{transaction.date}</td>
-                        <td className="p-2 text-sm text-white">{transaction.description}</td>
-                        <td className="p-2 text-sm text-neutral-300 text-center">
-                          {transaction.installment ? transaction.installment.current : '-'}
-                        </td>
-                        <td className="p-2 text-sm text-neutral-300 text-center">
-                          {transaction.installment ? transaction.installment.total : '-'}
-                        </td>
-                        <td className="p-2 text-sm text-danger text-right">
-                          {transaction.amount.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-4">
-                <Button variant="ghost" onClick={handleCancel}>
-                  Cancelar
-                </Button>
-                <Button onClick={handleImport}>
-                  Importar {extractedTransactions.length} Transações
-                </Button>
-              </div>
-            </div>
-          )}
-
+          </DialogTitle>
           {step === 'paste' && (
-            <div className="flex justify-end mt-4">
+            <DialogDescription>
+              Copie e cole as transações da sua fatura de cartão de crédito para importá-las
+              automaticamente.
+            </DialogDescription>
+          )}
+          {step === 'review' && (
+            <DialogDescription>
+              {extractedTransactions.length} transações foram encontradas. Revise-as antes de
+              importar.
+            </DialogDescription>
+          )}
+        </DialogHeader>
+
+        {step === 'paste' ? (
+          <div className="py-2">
+            <PDFExtractor onExtractComplete={handleExtractComplete} />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="border rounded-md overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Data</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead className="w-[80px] text-center">Parcela</TableHead>
+                    <TableHead className="w-[80px] text-center">Total</TableHead>
+                    <TableHead className="w-[100px] text-right">Valor (R$)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {extractedTransactions.map((transaction, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-mono text-xs">{transaction.date}</TableCell>
+                      <TableCell className="font-medium">{transaction.description}</TableCell>
+                      <TableCell className="text-center text-muted-foreground">
+                        {transaction.installment ? transaction.installment.current : '-'}
+                      </TableCell>
+                      <TableCell className="text-center text-muted-foreground">
+                        {transaction.installment ? transaction.installment.total : '-'}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {transaction.amount.toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <DialogFooter>
               <Button variant="ghost" onClick={handleCancel}>
                 Cancelar
               </Button>
-            </div>
-          )}
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+              <Button onClick={handleImport}>
+                Importar {extractedTransactions.length} Transações
+              </Button>
+            </DialogFooter>
+          </div>
+        )}
+
+        {step === 'paste' && (
+          <DialogFooter>
+            <Button variant="ghost" onClick={handleCancel}>
+              Cancelar
+            </Button>
+          </DialogFooter>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };

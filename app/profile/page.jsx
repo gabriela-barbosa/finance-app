@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 const Profile = () => {
   const [userProfile, setUserProfile] = useState({
@@ -186,9 +187,9 @@ const Profile = () => {
                   />
                 </div>
 
-                <button className="w-full py-2 px-4 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
+                <Button className="w-full" variant="default">
                   Salvar Alterações
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -204,72 +205,77 @@ const Profile = () => {
                   <span className="text-sm text-neutral-300">
                     Notificações de transações por email
                   </span>
-                  <button
+                  <Button
                     onClick={() => handleNotificationChange('emailTransacoes')}
                     className={`w-10 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
                       notificationSettings.emailTransacoes
                         ? 'bg-primary justify-end'
                         : 'bg-[#3a3444] justify-start'
                     }`}
+                    variant="ghost"
                   >
                     <span className="w-4 h-4 rounded-full bg-white mx-1"></span>
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-300">Relatórios mensais por email</span>
-                  <button
+                  <Button
                     onClick={() => handleNotificationChange('emailRelatorios')}
                     className={`w-10 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
                       notificationSettings.emailRelatorios
                         ? 'bg-primary justify-end'
                         : 'bg-[#3a3444] justify-start'
                     }`}
+                    variant="ghost"
                   >
                     <span className="w-4 h-4 rounded-full bg-white mx-1"></span>
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-300">Alertas de despesas altas</span>
-                  <button
+                  <Button
                     onClick={() => handleNotificationChange('pushAlertasDespesas')}
                     className={`w-10 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
                       notificationSettings.pushAlertasDespesas
                         ? 'bg-primary justify-end'
                         : 'bg-[#3a3444] justify-start'
                     }`}
+                    variant="ghost"
                   >
                     <span className="w-4 h-4 rounded-full bg-white mx-1"></span>
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-300">Lembretes de pagamentos</span>
-                  <button
+                  <Button
                     onClick={() => handleNotificationChange('pushLembretesPagamentos')}
                     className={`w-10 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
                       notificationSettings.pushLembretesPagamentos
                         ? 'bg-primary justify-end'
                         : 'bg-[#3a3444] justify-start'
                     }`}
+                    variant="ghost"
                   >
                     <span className="w-4 h-4 rounded-full bg-white mx-1"></span>
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-300">Dicas financeiras por email</span>
-                  <button
+                  <Button
                     onClick={() => handleNotificationChange('emailDicas')}
                     className={`w-10 h-6 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${
                       notificationSettings.emailDicas
                         ? 'bg-primary justify-end'
                         : 'bg-[#3a3444] justify-start'
                     }`}
+                    variant="ghost"
                   >
                     <span className="w-4 h-4 rounded-full bg-white mx-1"></span>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -317,12 +323,18 @@ const Profile = () => {
                     </div>
 
                     <div className="flex justify-end space-x-2">
-                      <button className="text-secondary hover:text-primary text-sm transition-colors">
+                      <Button
+                        variant="ghost"
+                        className="text-secondary hover:text-primary text-sm transition-colors"
+                      >
                         Editar
-                      </button>
-                      <button className="text-danger hover:text-red-600 text-sm transition-colors">
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="text-danger hover:text-red-600 text-sm transition-colors"
+                      >
                         Excluir
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -415,12 +427,9 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2 px-4 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
-                >
+                <Button type="submit" className="w-full" variant="default">
                   Adicionar Meta
-                </button>
+                </Button>
               </form>
             </div>
           </div>
