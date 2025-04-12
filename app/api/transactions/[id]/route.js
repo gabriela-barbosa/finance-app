@@ -4,8 +4,6 @@ export async function GET(request, { params }) {
   try {
     const { id } = params;
 
-    // In a real implementation, you would fetch the transaction from a database
-    // For demo purposes, we'll return a mock transaction
     const transaction = {
       id: Number(id),
       description: 'Transação de exemplo',
@@ -26,7 +24,6 @@ export async function PUT(request, { params }) {
     const { id } = params;
     const transaction = await request.json();
 
-    // Validate transaction data
     if (
       !transaction.description ||
       !transaction.amount ||
@@ -38,9 +35,6 @@ export async function PUT(request, { params }) {
         { status: 400 }
       );
     }
-
-    // In a real implementation, you would update the transaction in a database
-    // For demo purposes, we'll just return the updated transaction with the ID from the URL
 
     const updatedTransaction = {
       id: Number(id),
@@ -56,9 +50,6 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { id } = params;
-
-    // In a real implementation, you would delete the transaction from a database
-    // For demo purposes, we'll just return a success message
 
     return NextResponse.json({
       message: 'Transação excluída com sucesso',

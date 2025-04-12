@@ -85,7 +85,6 @@ const Profile = () => {
     e.preventDefault();
 
     if (!newGoal.titulo || !newGoal.valorAlvo || !newGoal.dataLimite) {
-      // We should implement a proper error message component in the future
       return;
     }
 

@@ -50,14 +50,12 @@ const Transactions = () => {
     try {
       setIsLoading(true);
 
-      // Process each transaction and save to the database
       const savedTransactions = [];
       for (const transaction of importedTransactions) {
         const savedTransaction = await createTransaction(transaction);
         savedTransactions.push(savedTransaction);
       }
 
-      // Refresh the transactions list after importing
       await fetchTransactions();
     } catch {
       setError('Erro ao importar transações.');

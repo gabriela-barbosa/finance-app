@@ -20,7 +20,6 @@ const mesesMap = {
  * Extraction patterns for different statement formats
  */
 const extractionPatterns = [
-  // Format: DD/MM/YYYY Description US$ 0,00 R$ XX,XX (Santander/BB)
   {
     regex: /(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+US\$\s+[\d.,]+\s+R\$\s+(-?[\d.,]+)/g,
     process: (match) => {
@@ -28,7 +27,6 @@ const extractionPatterns = [
       let installmentInfo = null;
       let cleanDescription = description;
 
-      // Standard format (01/12)
       const installmentMatch = description.match(/[(s](\d{1,2})\/(\d{1,2})[)s]?$/);
       if (installmentMatch) {
         installmentInfo = {
@@ -48,7 +46,6 @@ const extractionPatterns = [
     },
   },
 
-  // Format: DD MMM Description R$ XX,XX (Nubank)
   {
     regex:
       /(\d{1,2})\s+(JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)\s+(.+?)\s+(?:−)?R\$\s+([0-9.,]+)/gi,
@@ -69,7 +66,6 @@ const extractionPatterns = [
       let descricao = match[3].trim();
       let installmentInfo = null;
 
-      // Check multiple installment patterns
       const parcelaMatch = descricao.match(/\s*[-\s]?\s*Parcela\s+(\d+)\/(\d+)$/i);
       const parcelaMatch2 = !parcelaMatch && descricao.match(/\s*[-\s]?\s*(\d+)\/(\d+)$/);
       const parcelaMatch3 =

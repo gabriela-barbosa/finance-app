@@ -19,7 +19,6 @@ export async function POST(request) {
   try {
     const transaction = await request.json();
 
-    // Validar campos obrigatórios
     if (
       !transaction.description ||
       !transaction.amount ||
@@ -32,12 +31,10 @@ export async function POST(request) {
       );
     }
 
-    // Formatar a data se não for fornecida
     if (!transaction.date) {
       transaction.date = new Date().toISOString();
     }
 
-    // Salvar a transação no Supabase
     const newTransaction = await createTransaction(transaction);
     return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {
@@ -49,7 +46,6 @@ export async function PUT(request) {
   try {
     const transaction = await request.json();
 
-    // Validar dados da transação
     if (
       !transaction.id ||
       !transaction.description ||
@@ -63,7 +59,6 @@ export async function PUT(request) {
       );
     }
 
-    // Atualizar a transação no Supabase
     const id = transaction.id;
     const updatedTransaction = await updateTransaction(id, transaction);
 
@@ -75,14 +70,12 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
   try {
-    // Obter o ID da URL
     const id = request.nextUrl.searchParams.get('id');
 
     if (!id) {
       return NextResponse.json({ error: 'ID da transação é obrigatório' }, { status: 400 });
     }
 
-    // Excluir a transação no Supabase
     await deleteTransaction(id);
 
     return NextResponse.json({ message: 'Transação excluída com sucesso' });

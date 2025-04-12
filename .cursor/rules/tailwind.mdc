@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Tailwind CSS 4 Rule
+
+Always use Tailwind CSS 4 for styling with these guidelines:
+
+## Core Principles
+- Use Tailwind utility classes over custom CSS
+- Leverage Tailwind's JIT compiler
+- Maintain consistent spacing and color tokens
+
+## Best Practices
+- Group related utilities with `@apply` in component-specific CSS
+- Use arbitrary values (`[mask-type:luminance]`) only when necessary
+- Follow mobile-first responsive design
+- Implement dark mode with `dark:` variant
+
+## Avoid
+- Inline style attributes
+- Global CSS when Tailwind alternatives exist
+- Unnecessary custom utility extensions
+- Previous Tailwind versions (v3.x or older)
+
+## Configuration
+- Define theme settings in the globals file
+- Maintain theme tokens consistency across components
+- Extend functionality through globals rather than tailwind.config.js
+- Use theme variables for consistent design system implementation
